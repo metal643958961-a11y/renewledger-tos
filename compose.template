@@ -1,0 +1,29 @@
+services:
+  renewledger:
+    image: @IMAGE@
+    container_name: renewledger
+    platform: linux/amd64
+    user: "1000:1000"
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    pids_limit: 64
+    mem_limit: 96m
+    entrypoint: ["/usr/bin/python3", "-I", "-S", "-B"]
+    command:
+      - "-c"
+      - |
+        @CODE@
+    volumes: ["./data:/data"]
+    ports: ["18765:8080"]
+    healthcheck:
+      test: ["CMD", "/usr/bin/python3", "-ISB", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health',timeout=3).read()"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+x-app-meta:
+  web:
+    port: 18765
+    protocol: http

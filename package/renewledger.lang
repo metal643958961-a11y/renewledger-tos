@@ -1,0 +1,182 @@
+[zh-cn]
+name = "个人订阅台账"
+auth = "316z666"
+descript = "登记订阅费用、查询续费日，按月或年推进账期。"
+important = "首次启动后，在应用 data/password.txt 查看 admin 的随机密码；仅在受信任的局域网或 HTTPS 代理后访问。"
+release_note = "首版，支持人民币月付和年付订阅。"
+
+[zh-hk]
+name = "個人訂閱台帳"
+auth = "316z666"
+descript = "記錄訂閱費用、查閱續期日，按月或年更新帳期。"
+important = "首次啟動後，請在應用程式的 data/password.txt 查看 admin 的隨機密碼，只在受信任的區域網絡或 HTTPS 代理後使用。"
+release_note = "首版支援以人民幣月付及年付的訂閱。"
+
+[en-us]
+name = "Renew Ledger"
+auth = "316z666"
+descript = "Record recurring costs, find renewal dates and advance billing periods."
+important = "Read the generated admin password in data/password.txt. Use a trusted LAN or HTTPS proxy."
+release_note = "Initial beta for CNY monthly and yearly subscriptions."
+
+[ko-kr]
+name = "Renew Ledger"
+auth = "316z666"
+descript = "Record recurring costs, find renewal dates and advance billing periods."
+important = "Read the generated admin password in data/password.txt. Use a trusted LAN or HTTPS proxy."
+release_note = "Initial beta for CNY monthly and yearly subscriptions."
+
+[ja-jp]
+name = "Renew Ledger"
+auth = "316z666"
+descript = "Record recurring costs, find renewal dates and advance billing periods."
+important = "Read the generated admin password in data/password.txt. Use a trusted LAN or HTTPS proxy."
+release_note = "Initial beta for CNY monthly and yearly subscriptions."
+
+[de-de]
+name = "Renew Ledger"
+auth = "316z666"
+descript = "Record recurring costs, find renewal dates and advance billing periods."
+important = "Read the generated admin password in data/password.txt. Use a trusted LAN or HTTPS proxy."
+release_note = "Initial beta for CNY monthly and yearly subscriptions."
+
+[fr-fr]
+name = "Renew Ledger"
+auth = "316z666"
+descript = "Record recurring costs, find renewal dates and advance billing periods."
+important = "Read the generated admin password in data/password.txt. Use a trusted LAN or HTTPS proxy."
+release_note = "Initial beta for CNY monthly and yearly subscriptions."
+
+[it-it]
+name = "Renew Ledger"
+auth = "316z666"
+descript = "Record recurring costs, find renewal dates and advance billing periods."
+important = "Read the generated admin password in data/password.txt. Use a trusted LAN or HTTPS proxy."
+release_note = "Initial beta for CNY monthly and yearly subscriptions."
+
+[es-es]
+name = "Renew Ledger"
+auth = "316z666"
+descript = "Record recurring costs, find renewal dates and advance billing periods."
+important = "Read the generated admin password in data/password.txt. Use a trusted LAN or HTTPS proxy."
+release_note = "Initial beta for CNY monthly and yearly subscriptions."
+
+[hu-hu]
+name = "Renew Ledger"
+auth = "316z666"
+descript = "Record recurring costs, find renewal dates and advance billing periods."
+important = "Read the generated admin password in data/password.txt. Use a trusted LAN or HTTPS proxy."
+release_note = "Initial beta for CNY monthly and yearly subscriptions."
+
+[pl-pl]
+name = "Renew Ledger"
+auth = "316z666"
+descript = "Record recurring costs, find renewal dates and advance billing periods."
+important = "Read the generated admin password in data/password.txt. Use a trusted LAN or HTTPS proxy."
+release_note = "Initial beta for CNY monthly and yearly subscriptions."
+
+[tr-tr]
+name = "Renew Ledger"
+auth = "316z666"
+descript = "Record recurring costs, find renewal dates and advance billing periods."
+important = "Read the generated admin password in data/password.txt. Use a trusted LAN or HTTPS proxy."
+release_note = "Initial beta for CNY monthly and yearly subscriptions."
+
+[ru-ru]
+name = "Renew Ledger"
+auth = "316z666"
+descript = "Record recurring costs, find renewal dates and advance billing periods."
+important = "Read the generated admin password in data/password.txt. Use a trusted LAN or HTTPS proxy."
+release_note = "Initial beta for CNY monthly and yearly subscriptions."
+
+[pt-pt]
+name = "Renew Ledger"
+auth = "316z666"
+descript = "Record recurring costs, find renewal dates and advance billing periods."
+important = "Read the generated admin password in data/password.txt. Use a trusted LAN or HTTPS proxy."
+release_note = "Initial beta for CNY monthly and yearly subscriptions."
+
+[cs-cz]
+name = "Renew Ledger"
+auth = "316z666"
+descript = "Record recurring costs, find renewal dates and advance billing periods."
+important = "Read the generated admin password in data/password.txt. Use a trusted LAN or HTTPS proxy."
+release_note = "Initial beta for CNY monthly and yearly subscriptions."
+
+[da-dk]
+name = "Renew Ledger"
+auth = "316z666"
+descript = "Record recurring costs, find renewal dates and advance billing periods."
+important = "Read the generated admin password in data/password.txt. Use a trusted LAN or HTTPS proxy."
+release_note = "Initial beta for CNY monthly and yearly subscriptions."
+
+[nl-nl]
+name = "Renew Ledger"
+auth = "316z666"
+descript = "Record recurring costs, find renewal dates and advance billing periods."
+important = "Read the generated admin password in data/password.txt. Use a trusted LAN or HTTPS proxy."
+release_note = "Initial beta for CNY monthly and yearly subscriptions."
+
+[nb-no]
+name = "Renew Ledger"
+auth = "316z666"
+descript = "Record recurring costs, find renewal dates and advance billing periods."
+important = "Read the generated admin password in data/password.txt. Use a trusted LAN or HTTPS proxy."
+release_note = "Initial beta for CNY monthly and yearly subscriptions."
+
+[sv-se]
+name = "Renew Ledger"
+auth = "316z666"
+descript = "Record recurring costs, find renewal dates and advance billing periods."
+important = "Read the generated admin password in data/password.txt. Use a trusted LAN or HTTPS proxy."
+release_note = "Initial beta for CNY monthly and yearly subscriptions."
+
+[el-gr]
+name = "Renew Ledger"
+auth = "316z666"
+descript = "Record recurring costs, find renewal dates and advance billing periods."
+important = "Read the generated admin password in data/password.txt. Use a trusted LAN or HTTPS proxy."
+release_note = "Initial beta for CNY monthly and yearly subscriptions."
+
+[ro-ro]
+name = "Renew Ledger"
+auth = "316z666"
+descript = "Record recurring costs, find renewal dates and advance billing periods."
+important = "Read the generated admin password in data/password.txt. Use a trusted LAN or HTTPS proxy."
+release_note = "Initial beta for CNY monthly and yearly subscriptions."
+
+[th-th]
+name = "Renew Ledger"
+auth = "316z666"
+descript = "Record recurring costs, find renewal dates and advance billing periods."
+important = "Read the generated admin password in data/password.txt. Use a trusted LAN or HTTPS proxy."
+release_note = "Initial beta for CNY monthly and yearly subscriptions."
+
+[vi-vn]
+name = "Renew Ledger"
+auth = "316z666"
+descript = "Record recurring costs, find renewal dates and advance billing periods."
+important = "Read the generated admin password in data/password.txt. Use a trusted LAN or HTTPS proxy."
+release_note = "Initial beta for CNY monthly and yearly subscriptions."
+
+[id-id]
+name = "Renew Ledger"
+auth = "316z666"
+descript = "Record recurring costs, find renewal dates and advance billing periods."
+important = "Read the generated admin password in data/password.txt. Use a trusted LAN or HTTPS proxy."
+release_note = "Initial beta for CNY monthly and yearly subscriptions."
+
+[ar-sa]
+name = "Renew Ledger"
+auth = "316z666"
+descript = "Record recurring costs, find renewal dates and advance billing periods."
+important = "Read the generated admin password in data/password.txt. Use a trusted LAN or HTTPS proxy."
+release_note = "Initial beta for CNY monthly and yearly subscriptions."
+
+[he-il]
+name = "Renew Ledger"
+auth = "316z666"
+descript = "Record recurring costs, find renewal dates and advance billing periods."
+important = "Read the generated admin password in data/password.txt. Use a trusted LAN or HTTPS proxy."
+release_note = "Initial beta for CNY monthly and yearly subscriptions."
+
