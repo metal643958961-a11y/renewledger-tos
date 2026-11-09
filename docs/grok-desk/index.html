@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#05060d" />
+  <title>GROK DESK · PAPER SIM</title>
+  <meta name="desk-base" content="https://sbcojffhiclyddvwfxrf.supabase.co/functions/v1/desk" />
+  <style>
+:root {
+  --bg: #05060d;
+  --panel: rgba(8, 12, 24, 0.88);
+  --line: rgba(46, 243, 214, 0.28);
+  --cyan: #2ef3d6;
+  --pink: #ff2d95;
+  --orange: #ff8a2a;
+  --blue: #4da3ff;
+  --green: #3dff8a;
+  --purple: #c44dff;
+  --red: #ff4d6a;
+  --text: #e7f3ff;
+  --muted: #7d8ea6;
+  --spotter: #2ef3d6;
+  --kelly: #ff2d95;
+  --prior: #ff8a2a;
+  --taker: #4da3ff;
+  --edge: #3dff8a;
+  --closer: #ff4d6a;
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-r: env(safe-area-inset-right, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-l: env(safe-area-inset-left, 0px);
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Avenir Next", "SF Pro Display", "Segoe UI", system-ui, sans-serif;
+  font-size: 11px;
+  user-select: none;
+  overscroll-behavior: none;
+}
+
+body {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(1200px 700px at 50% 42%, rgba(36, 20, 80, 0.28), transparent 55%),
+    radial-gradient(900px 500px at 80% 10%, rgba(0, 80, 90, 0.18), transparent 50%),
+    var(--bg);
+}
+
+body::after {
+  content: "";
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.015) 0 1px,
+    transparent 1px 3px
+  );
+  opacity: 0.35;
+  z-index: 8;
+}
+
+.desk {
+  height: 100%;
+  height: 100vh;
+  height: 100dvh;
+  display: grid;
+  grid-template-rows: 38px 24px minmax(0, 0.82fr) minmax(0, 1.42fr) minmax(0, 1.04fr) 18px;
+  gap: 5px;
+  padding: max(5px, var(--safe-t)) max(7px, var(--safe-r)) max(4px, var(--safe-b)) max(7px, var(--safe-l));
+  overflow: hidden;
+}
+
+.topbar, .statusbar, .foot {
+  display: flex;
+  align-items: center;
+  min-height: 0;
+}
+
+.topbar { justify-content: space-between; gap: 10px; }
+
+.brand { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.brand-name {
+  font-size: 13px;
+  letter-spacing: 0.22em;
+  font-weight: 700;
+}
+.brand-sub { font-size: 8px; letter-spacing: 0.12em; color: var(--muted); white-space: nowrap; }
+.brand-sub b { color: var(--orange); }
+
+.orb-mini {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff, #cfd8e6 55%, #8b93a7);
+  box-shadow: 0 0 12px rgba(255,255,255,0.45);
+  position: relative;
+}
+.orb-mini i {
+  position: absolute; width: 4px; height: 6px; background: #111; border-radius: 50%;
+  top: 8px;
+}
+.orb-mini i:first-child { left: 6px; }
+.orb-mini i:last-child { right: 6px; }
+
+.tabs { display: flex; gap: 4px; }
+.tabs span {
+  font-size: 9px; letter-spacing: 0.16em; color: var(--muted);
+  border: 1px solid rgba(255,255,255,0.08); padding: 4px 8px; border-radius: 10px;
+}
+.tabs span.on { color: var(--cyan); border-color: rgba(46,243,214,0.4); }
+
+.kpis { display: flex; gap: 14px; }
+.kpis div { text-align: right; }
+.kpis em { display: block; font-style: normal; font-size: 14px; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.kpis small { color: var(--muted); font-size: 8px; letter-spacing: 0.12em; }
+.paper-x { color: var(--orange) !important; }
+.up { color: var(--green); }
+.dn { color: var(--red); }
+
+.swarm-pill {
+  display: flex; align-items: center; gap: 6px;
+  border: 1px solid rgba(61,255,138,0.45);
+  color: var(--green); padding: 5px 9px; border-radius: 14px;
+  font-size: 9px; letter-spacing: 0.14em;
+}
+.swarm-pill i {
+  width: 7px; height: 7px; border-radius: 50%; background: var(--green);
+  box-shadow: 0 0 8px var(--green); animation: pulse 1.6s infinite;
+}
+
+.statusbar {
+  gap: 7px; overflow: hidden; white-space: nowrap;
+  font-size: 9px; letter-spacing: 0.06em; color: var(--muted);
+}
+.pill {
+  border: 1px solid var(--line); padding: 2px 7px; border-radius: 9px; color: var(--cyan);
+}
+.pill.live { border-color: rgba(61,255,138,0.4); color: var(--green); }
+.pill.warn { border-color: rgba(255,138,42,0.5); color: var(--orange); }
+.pill small { color: var(--muted); padding-left: 4px; }
+.stat b { color: var(--text); padding: 0 3px; font-variant-numeric: tabular-nums; }
+.stat.dim { color: #5d6c82; }
+
+.row-top, .row-bot {
+  display: grid;
+  gap: 6px;
+  min-height: 0;
+}
+.row-top { grid-template-columns: 1.02fr 1.16fr 1.12fr; }
+.row-bot { grid-template-columns: 0.92fr 1.48fr; }
+
+.panel {
+  position: relative;
+  min-height: 0;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: inset 0 0 40px rgba(46,243,214,0.03);
+}
+.panel::before, .panel::after {
+  content: "";
+  position: absolute; width: 10px; height: 10px; pointer-events: none;
+  border: 1px solid rgba(46,243,214,0.55);
+}
+.panel::before { top: 3px; left: 3px; border-right: 0; border-bottom: 0; }
+.panel::after { right: 3px; bottom: 3px; border-left: 0; border-top: 0; }
+
+.panel > header {
+  display: flex; align-items: center; gap: 6px;
+  padding: 4px 8px 3px;
+  flex: 0 0 auto;
+}
+.panel > header h2 {
+  margin: 0; font-size: 10px; letter-spacing: 0.16em; font-weight: 700;
+}
+.panel > header .sub { color: var(--muted); font-size: 8px; letter-spacing: 0.08em; }
+.tag { width: 7px; height: 7px; border-radius: 50%; box-shadow: 0 0 8px currentColor; }
+.tag.cyan { background: var(--cyan); color: var(--cyan); }
+.tag.pink { background: var(--pink); color: var(--pink); }
+.tag.orange { background: var(--orange); color: var(--orange); }
+.tag.green { background: var(--green); color: var(--green); }
+.tag.blue { background: var(--blue); color: var(--blue); }
+
+.panel-body { flex: 1; min-height: 0; position: relative; }
+.panel-body canvas { width: 100%; height: 100%; display: block; }
+
+.signal-legend, .pricer-meta {
+  position: absolute; left: 8px; right: 8px; bottom: 4px;
+  display: flex; gap: 10px; font-size: 9px; color: var(--muted);
+}
+.signal-legend b, .pricer-meta b { color: var(--text); font-variant-numeric: tabular-nums; }
+
+.trace {
+  height: 100%;
+  overflow: auto;
+  padding: 2px 8px 6px;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+.tr {
+  display: grid;
+  grid-template-columns: 54px 1fr;
+  gap: 6px;
+  padding: 3px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  font-size: 10px; line-height: 1.25;
+}
+.tr i { font-style: normal; letter-spacing: 0.08em; font-size: 9px; }
+.tr[data-agent="SPOTTER"] i { color: var(--spotter); }
+.tr[data-agent="KELLY"] i { color: var(--kelly); }
+.tr[data-agent="PRIOR"] i { color: var(--prior); }
+.tr[data-agent="TAKER"] i { color: var(--taker); }
+.tr[data-agent="EDGE"] i { color: var(--edge); }
+.tr[data-agent="CLOSER"] i { color: var(--closer); }
+
+.synapse-wrap { display: flex; flex-direction: column; }
+.synapse-body { position: relative; overflow: hidden; }
+.syn-price { margin-left: auto; text-align: right; }
+.syn-price b { font-size: 18px; font-variant-numeric: tabular-nums; }
+.syn-price small { display: block; color: var(--muted); font-size: 8px; letter-spacing: 0.1em; }
+
+.orb {
+  position: absolute; left: 50%; top: 46%;
+  width: min(86px, 16vh); height: min(86px, 16vh);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 28%, #ffffff, #d5dbe8 52%, #8e96aa);
+  box-shadow: 0 0 28px rgba(255,255,255,0.28), 0 0 80px rgba(140, 90, 255, 0.18);
+  z-index: 3;
+}
+.orb i {
+  position: absolute; top: 38%; width: 12%; height: 18%;
+  background: #111; border-radius: 50%;
+}
+.orb i:first-child { left: 28%; }
+.orb i:last-child { right: 28%; }
+
+.agent-node {
+  position: absolute;
+  left: var(--x); top: var(--y);
+  transform: translate(-50%, -50%);
+  min-width: 74px;
+  padding: 5px 8px;
+  border-radius: 14px;
+  background: rgba(8,10,20,0.72);
+  border: 1px solid rgba(255,255,255,0.12);
+  text-align: center;
+  z-index: 4;
+}
+.agent-node b { display: block; font-size: 9px; letter-spacing: 0.14em; }
+.agent-node small { color: var(--muted); font-size: 8px; }
+.agent-node[data-agent="SPOTTER"] { border-color: rgba(46,243,214,0.55); color: var(--spotter); }
+.agent-node[data-agent="KELLY"] { border-color: rgba(255,45,149,0.55); color: var(--kelly); }
+.agent-node[data-agent="PRIOR"] { border-color: rgba(255,138,42,0.55); color: var(--prior); }
+.agent-node[data-agent="TAKER"] { border-color: rgba(77,163,255,0.55); color: var(--taker); }
+.agent-node[data-agent="EDGE"] { border-color: rgba(61,255,138,0.55); color: var(--edge); }
+.agent-node[data-agent="CLOSER"] { border-color: rgba(255,77,106,0.55); color: var(--closer); }
+
+.agent-bar {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 4px;
+  padding: 4px 8px 6px;
+  flex: 0 0 auto;
+}
+.agent-chip {
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 3px 5px;
+  min-height: 34px;
+  overflow: hidden;
+}
+.agent-chip b { display: block; font-size: 8px; letter-spacing: 0.12em; }
+.agent-chip span {
+  display: block; color: var(--muted); font-size: 8px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.agent-chip[data-agent="SPOTTER"] { color: var(--spotter); border-color: rgba(46,243,214,0.35); }
+.agent-chip[data-agent="KELLY"] { color: var(--kelly); border-color: rgba(255,45,149,0.35); }
+.agent-chip[data-agent="PRIOR"] { color: var(--prior); border-color: rgba(255,138,42,0.35); }
+.agent-chip[data-agent="TAKER"] { color: var(--taker); border-color: rgba(77,163,255,0.35); }
+.agent-chip[data-agent="EDGE"] { color: var(--edge); border-color: rgba(61,255,138,0.35); }
+.agent-chip[data-agent="CLOSER"] { color: var(--closer); border-color: rgba(255,77,106,0.35); }
+
+.swarm-body { display: grid; grid-template-rows: auto minmax(0,1fr) auto; padding: 2px 8px 6px; gap: 3px; }
+.swarm-head { display: flex; justify-content: space-between; align-items: flex-end; }
+.swarm-head .big { font-size: clamp(22px, 3.4vh, 34px); font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; }
+.sw-side { text-align: right; }
+.sw-side #sw-delta { font-size: 14px; }
+.sw-stats { display: flex; gap: 8px; color: var(--muted); font-size: 9px; }
+.sw-stats b { color: var(--text); }
+.ticket-mini { font-size: 9px; color: var(--muted); display: grid; gap: 1px; }
+.ticket-mini div { display: flex; justify-content: space-between; gap: 8px; }
+
+.tape-body { display: grid; grid-template-columns: 1fr 118px; min-height: 0; }
+.book {
+  overflow: hidden;
+  padding: 4px 6px 4px 0;
+  font-size: 9px;
+  font-variant-numeric: tabular-nums;
+}
+.book .row { display: grid; grid-template-columns: 1fr 52px; gap: 4px; align-items: center; }
+.book .bar { height: 7px; background: rgba(255,77,106,0.55); justify-self: end; min-width: 2px; }
+.book .row.bid .bar { background: rgba(61,255,138,0.5); justify-self: start; }
+.book .mid { text-align: center; color: var(--cyan); padding: 3px 0; letter-spacing: 0.08em; }
+
+.foot {
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  padding: 0 4px;
+}
+.warn-txt { color: #d7a05a; }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+/* iPad portrait ~1024 x 1366 */
+@media (orientation: portrait) {
+  .desk {
+    grid-template-rows: 40px 24px minmax(0, 0.74fr) minmax(0, 1.38fr) minmax(0, 1.18fr) 18px;
+    gap: 6px;
+  }
+  .orb { width: min(96px, 12vh); height: min(96px, 12vh); }
+}
+
+/* iPad landscape ~1366 x 1024 — prefer this dense dashboard */
+@media (orientation: landscape) {
+  .desk {
+    grid-template-rows: 34px 22px minmax(0, 0.80fr) minmax(0, 1.36fr) minmax(0, 1.00fr) 16px;
+    gap: 5px;
+  }
+  body { font-size: 10.5px; }
+  .kpis em { font-size: 13px; }
+  .syn-price b { font-size: 16px; }
+  .agent-node { min-width: 70px; padding: 4px 7px; }
+}
+
+/* slightly smaller landscape / split view */
+@media (max-height: 900px) and (orientation: landscape) {
+  .desk {
+    grid-template-rows: 32px 20px minmax(0, 0.78fr) minmax(0, 1.32fr) minmax(0, 0.98fr) 15px;
+    gap: 4px;
+  }
+  .brand-sub, .tabs { display: none; }
+  .agent-chip { min-height: 28px; }
+}
+
+@media (max-width: 1100px) {
+  .tabs { display: none; }
+  .kpis { gap: 10px; }
+  .row-top { grid-template-columns: 1fr 1.1fr 1fr; }
+  .tape-body { grid-template-columns: 1fr 104px; }
+}
+
+@media (max-width: 820px) {
+  .desk {
+    grid-template-rows: 36px 22px minmax(0, 0.7fr) minmax(0, 1.2fr) minmax(0, 1.15fr) 18px;
+  }
+  .row-top { grid-template-columns: 1fr 1fr; }
+  .row-top .panel:last-child { display: none; }
+  .kpis div:nth-child(3) { display: none; }
+}
+
+  </style>
+</head>
+<body>
+  <div class="desk" id="desk">
+    <header class="topbar">
+      <div class="brand">
+        <div class="orb-mini" aria-hidden="true"><i></i><i></i></div>
+        <div>
+          <div class="brand-name">GROK DESK</div>
+          <div class="brand-sub">SIX AGENTS · ONE BOOK · BTC UP/DOWN 5M · <b>PAPER SIM</b></div>
+        </div>
+      </div>
+      <nav class="tabs">
+        <span class="on">SYNAPSE</span>
+        <span>TAPE</span>
+        <span>BOOK</span>
+      </nav>
+      <div class="kpis">
+        <div><em id="kpi-eq">$10,000</em><small>EQUITY</small></div>
+        <div><em id="kpi-pnl" class="up">+$0</em><small>VS START</small></div>
+        <div><em class="paper-x">PAPER 1×</em><small>NO LEVERAGE</small></div>
+        <div><em id="kpi-clock">00:00:00</em><small>UTC</small></div>
+      </div>
+      <div class="swarm-pill">
+        <i></i>
+        <span>SWARM ONLINE</span>
+      </div>
+    </header>
+
+    <div class="statusbar">
+      <span class="pill live">SIX AGENTS LIVE</span>
+      <span class="pill warn">PAPER SIM</span>
+      <span class="pill">APPROVALS ONLY <small>AUTO-APPROVE IN SIM</small></span>
+      <span class="stat">HANDOFFS/MIN <b id="st-handoff">0</b></span>
+      <span class="stat">MODEL FAIR <b id="st-fair">—</b></span>
+      <span class="stat">MKT <b id="st-mkt">—</b></span>
+      <span class="stat">EDGE <b id="st-edge">—</b></span>
+      <span class="stat">OPEN <b id="st-open">0</b> TICKETS</span>
+      <span class="stat">WINDOW <b id="st-left">5:00</b></span>
+      <span class="stat dim" id="st-feed">FEED …</span>
+    </div>
+
+    <section class="row-top">
+      <article class="panel">
+        <header>
+          <span class="tag cyan"></span>
+          <h2>SIGNAL ROTATION</h2>
+          <span class="sub">VALUE AREA · STRENGTH · MOMENTUM</span>
+        </header>
+        <div class="panel-body">
+          <canvas id="cv-signal"></canvas>
+          <div class="signal-legend">
+            <span>POC <b id="lg-poc">—</b></span>
+            <span>VAL <b id="lg-val">—</b></span>
+            <span>VAH <b id="lg-vah">—</b></span>
+          </div>
+        </div>
+      </article>
+
+      <article class="panel">
+        <header>
+          <span class="tag pink"></span>
+          <h2>THE TRACE</h2>
+          <span class="sub">EVERY STEP · ONE LINE, SIX COLOURS</span>
+        </header>
+        <div class="panel-body">
+          <div class="trace" id="trace"></div>
+        </div>
+      </article>
+
+      <article class="panel">
+        <header>
+          <span class="tag orange"></span>
+          <h2>THE PRICER</h2>
+          <span class="sub">FAN OF FUTURES · EACH PATH ONE SIM</span>
+        </header>
+        <div class="panel-body pricer-body">
+          <canvas id="cv-pricer"></canvas>
+          <div class="pricer-meta">
+            <span>UP <b id="px-up">—</b></span>
+            <span>DN <b id="px-dn">—</b></span>
+            <span>REF <b id="px-ref">—</b></span>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="row-mid panel synapse-wrap">
+      <header>
+        <span class="tag cyan"></span>
+        <h2>THE SYNAPSE</h2>
+        <span class="sub">SIX NEURONS · ONE SPIKE CARRIES THE TICKET · PAPER DESK</span>
+        <div class="syn-price">
+          <b id="syn-spot">—</b>
+          <small id="syn-chg">BTC-USDT</small>
+        </div>
+      </header>
+      <div class="panel-body synapse-body">
+        <canvas id="cv-synapse"></canvas>
+        <div class="orb" id="orb"><i></i><i></i></div>
+        <div class="agent-node" data-agent="SPOTTER" style="--x:78%;--y:16%"><b>SPOTTER</b><small id="n-SPOTTER">SCAN</small></div>
+        <div class="agent-node" data-agent="KELLY" style="--x:8%;--y:50%"><b>KELLY</b><small id="n-KELLY">SIZE</small></div>
+        <div class="agent-node" data-agent="PRIOR" style="--x:22%;--y:84%"><b>PRIOR</b><small id="n-PRIOR">READY</small></div>
+        <div class="agent-node" data-agent="TAKER" style="--x:88%;--y:50%"><b>TAKER</b><small id="n-TAKER">IDLE</small></div>
+        <div class="agent-node" data-agent="EDGE" style="--x:70%;--y:84%"><b>EDGE</b><small id="n-EDGE">—</small></div>
+        <div class="agent-node" data-agent="CLOSER" style="--x:12%;--y:16%"><b>CLOSER</b><small id="n-CLOSER">WATCH</small></div>
+      </div>
+      <div class="agent-bar" id="agent-bar"></div>
+    </section>
+
+    <section class="row-bot">
+      <article class="panel">
+        <header>
+          <span class="tag green"></span>
+          <h2>SWARM PNL</h2>
+          <span class="sub">ONE BOOK · PAPER BALANCE · RUNNING</span>
+        </header>
+        <div class="panel-body swarm-body">
+          <div class="swarm-head">
+            <div class="big" id="sw-eq">$10,000</div>
+            <div class="sw-side">
+              <div id="sw-delta" class="up">+$0</div>
+              <div class="sw-stats">
+                <span>WR <b id="sw-wr">—</b></span>
+                <span>N <b id="sw-n">0</b></span>
+                <span>AVG <b id="sw-avg">—</b></span>
+              </div>
+            </div>
+          </div>
+          <canvas id="cv-pnl"></canvas>
+          <div class="ticket-mini" id="tickets"></div>
+        </div>
+      </article>
+
+      <article class="panel tape-panel">
+        <header>
+          <span class="tag blue"></span>
+          <h2>THE TAPE</h2>
+          <span class="sub">BTC 1M · VWAP · T-BANDS · VALUE AREA · LIVE BOOK</span>
+          <span class="sub" id="tape-last"></span>
+        </header>
+        <div class="panel-body tape-body">
+          <canvas id="cv-tape"></canvas>
+          <div class="book" id="book"></div>
+        </div>
+      </article>
+    </section>
+
+    <footer class="foot">
+      <span>GROK DESK · ONLINE</span>
+      <span class="warn-txt">SIMULATION ONLY — no Polymarket, no private keys, no live orders, no real money</span>
+      <span id="foot-extra">start $10,000 USDC-eq · Quant Profile VA 70%</span>
+    </footer>
+  </div>
+  <script>window.DESK_BASE="https://sbcojffhiclyddvwfxrf.supabase.co/functions/v1/desk";</script>
+  <script>
+const $ = (sel) => document.querySelector(sel);
+const AGENTS = ["SPOTTER", "PRIOR", "EDGE", "KELLY", "TAKER", "CLOSER"];
+const COLORS = {
+  SPOTTER: "#2ef3d6",
+  PRIOR: "#ff8a2a",
+  EDGE: "#3dff8a",
+  KELLY: "#ff2d95",
+  TAKER: "#4da3ff",
+  CLOSER: "#ff4d6a",
+};
+
+let status = null;
+let tape = null;
+let traces = [];
+let equity = [];
+let t0 = performance.now();
+
+function fmt(n, d = 0) {
+  if (n == null || Number.isNaN(n)) return "—";
+  return Number(n).toLocaleString("en-US", { maximumFractionDigits: d, minimumFractionDigits: d });
+}
+function usd(n) {
+  if (n == null || Number.isNaN(n)) return "—";
+  const sign = n < 0 ? "-" : "";
+  return `${sign}$${fmt(Math.abs(n), 2)}`;
+}
+function signedUsd(n) {
+  if (n == null || Number.isNaN(n)) return "—";
+  const sign = n >= 0 ? "+" : "-";
+  return `${sign}$${fmt(Math.abs(n), 2)}`;
+}
+function fit(cv) {
+  const r = cv.getBoundingClientRect();
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const w = Math.max(1, Math.floor(r.width * dpr));
+  const h = Math.max(1, Math.floor(r.height * dpr));
+  if (cv.width !== w || cv.height !== h) {
+    cv.width = w;
+    cv.height = h;
+  }
+  return { w, h, dpr, ctx: cv.getContext("2d") };
+}
+
+const DESK_BASE = String(window.DESK_BASE || document.querySelector('meta[name="desk-base"]')?.getAttribute('content') || '').replace(/\/$/, '');
+async function jget(url) {
+  const r = await fetch(DESK_BASE + url, { cache: "no-store" });
+  if (!r.ok) throw new Error(url + " " + r.status);
+  return r.json();
+}
+
+function renderChrome(s) {
+  const w = s.wallet;
+  const m = s.market;
+  $("#kpi-eq").textContent = usd(w.equity);
+  const pnlEl = $("#kpi-pnl");
+  pnlEl.textContent = signedUsd(w.pnl);
+  pnlEl.className = w.pnl >= 0 ? "up" : "dn";
+  $("#kpi-clock").textContent = s.clock_utc || "—";
+  $("#st-handoff").textContent = s.stats.handoffs_per_min;
+  const lastTake = (s.last_signals || []).find((x) => x.action === "take") || s.last_signals[0];
+  $("#st-fair").textContent = lastTake && lastTake.model != null ? lastTake.model.toFixed(3) : "—";
+  $("#st-mkt").textContent = lastTake && lastTake.mkt != null ? lastTake.mkt.toFixed(3) : (m.window.up_mid != null ? m.window.up_mid.toFixed(3) : "—");
+  const edgeEl = $("#st-edge");
+  if (lastTake && lastTake.edge != null) {
+    edgeEl.textContent = (lastTake.edge * 100).toFixed(1) + "c";
+  } else {
+    edgeEl.textContent = "—";
+  }
+  $("#st-open").textContent = s.stats.open;
+  const left = m.window.seconds_left || 0;
+  $("#st-left").textContent = `${Math.floor(left / 60)}:${String(left % 60).padStart(2, "0")}`;
+  $("#st-feed").textContent = (s.feed.source || s.feed.mode || "").toUpperCase();
+
+  $("#syn-spot").textContent = "$" + fmt(m.spot, 1);
+  const chg = $("#syn-chg");
+  chg.textContent = `BTC-USDT  ${m.change_24h >= 0 ? "+" : ""}${fmt(m.change_24h, 2)}%`;
+  chg.style.color = m.change_24h >= 0 ? "var(--green)" : "var(--red)";
+
+  if (m.profile) {
+    $("#lg-poc").textContent = fmt(m.profile.poc, 1);
+    $("#lg-val").textContent = fmt(m.profile.val, 1);
+    $("#lg-vah").textContent = fmt(m.profile.vah, 1);
+  }
+  $("#px-up").textContent = m.window.up_mid != null ? m.window.up_mid.toFixed(3) : "—";
+  $("#px-dn").textContent = m.window.down_mid != null ? m.window.down_mid.toFixed(3) : "—";
+  $("#px-ref").textContent = fmt(m.window.ref, 1);
+  $("#tape-last").textContent = `LAST ${fmt(m.spot, 1)}`;
+
+  $("#sw-eq").textContent = usd(w.equity);
+  const d = $("#sw-delta");
+  d.textContent = `${signedUsd(w.pnl)}  (${w.pnl_pct >= 0 ? "+" : ""}${fmt(w.pnl_pct, 2)}%)`;
+  d.className = w.pnl >= 0 ? "up" : "dn";
+  $("#sw-wr").textContent = (s.stats.win_rate * 100).toFixed(1) + "%";
+  $("#sw-n").textContent = `${s.stats.won}/${s.stats.settled || 0}`;
+  $("#sw-avg").textContent = s.stats.avg_stake ? usd(s.stats.avg_stake) : "—";
+
+  for (const name of AGENTS) {
+    const a = s.agents[name] || { state: "—", note: "" };
+    const node = $("#n-" + name);
+    if (node) node.textContent = a.state;
+  }
+  const bar = $("#agent-bar");
+  bar.innerHTML = AGENTS.map((name) => {
+    const a = s.agents[name] || { state: "—", note: "" };
+    return `<div class="agent-chip" data-agent="${name}"><b>${name} · ${a.state}</b><span>${a.note || ""}</span></div>`;
+  }).join("");
+}
+
+function renderTrace(items) {
+  const box = $("#trace");
+  box.innerHTML = (items || [])
+    .slice(0, 60)
+    .map((t) => `<div class="tr" data-agent="${t.agent}"><i>${t.agent}</i><span>${escapeHtml(t.message)}</span></div>`)
+    .join("");
+}
+
+function renderTickets(list) {
+  const box = $("#tickets");
+  const rows = (list || []).slice(0, 4);
+  box.innerHTML = rows
+    .map((t) => {
+      const pnl = t.status === "open" ? t.mtm : t.pnl;
+      const cls = (pnl || 0) >= 0 ? "up" : "dn";
+      return `<div><span>#${t.id} ${t.side} @ ${Number(t.entry_px).toFixed(3)} · ${t.status}</span><span class="${cls}">${signedUsd(pnl)}</span></div>`;
+    })
+    .join("") || "<div><span>no tickets yet</span><span></span></div>";
+}
+
+function renderBook(depth, spot) {
+  const box = $("#book");
+  if (!depth || (!depth.asks.length && !depth.bids.length)) {
+    box.innerHTML = "<div class='mid'>NO BOOK</div>";
+    return;
+  }
+  const asks = [...depth.asks].slice(0, 7).reverse();
+  const bids = depth.bids.slice(0, 7);
+  const maxQ = Math.max(0.0001, ...asks.map((x) => x[1]), ...bids.map((x) => x[1]));
+  const askRows = asks
+    .map(([p, q]) => `<div class="row ask"><div class="bar" style="width:${Math.max(8, (q / maxQ) * 100)}%"></div><span style="color:var(--red)">${fmt(p, 1)}</span></div>`)
+    .join("");
+  const bidRows = bids
+    .map(([p, q]) => `<div class="row bid"><div class="bar" style="width:${Math.max(8, (q / maxQ) * 100)}%"></div><span style="color:var(--green)">${fmt(p, 1)}</span></div>`)
+    .join("");
+  box.innerHTML = `${askRows}<div class="mid">${fmt(spot, 1)}</div>${bidRows}`;
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+function drawSynapse(cv) {
+  const { ctx, w, h } = fit(cv);
+  ctx.clearRect(0, 0, w, h);
+  const cx = w * 0.5;
+  const cy = h * 0.46;
+  const t = (performance.now() - t0) / 1000;
+  const seeds = [
+    { c: COLORS.SPOTTER, ang: -0.6 },
+    { c: COLORS.KELLY, ang: 2.6 },
+    { c: COLORS.PRIOR, ang: 2.1 },
+    { c: COLORS.TAKER, ang: 0.15 },
+    { c: COLORS.EDGE, ang: 1.05 },
+    { c: COLORS.CLOSER, ang: 3.5 },
+  ];
+  for (const s of seeds) {
+    for (let i = 0; i < 18; i++) {
+      const a = s.ang + Math.sin(t * 0.4 + i) * 0.35 + i * 0.03;
+      const r1 = Math.min(w, h) * 0.08;
+      const r2 = Math.min(w, h) * (0.34 + (i % 5) * 0.04);
+      ctx.beginPath();
+      ctx.strokeStyle = hexA(s.c, 0.10 + (i % 4) * 0.03);
+      ctx.lineWidth = 1;
+      const x1 = cx + Math.cos(a) * r1;
+      const y1 = cy + Math.sin(a) * r1;
+      const x2 = cx + Math.cos(a + 0.4) * r2;
+      const y2 = cy + Math.sin(a * 1.15) * r2 * 0.85;
+      ctx.moveTo(x1, y1);
+      ctx.bezierCurveTo(
+        cx + Math.cos(a) * r2 * 0.45,
+        cy + Math.sin(a) * r2 * 0.15,
+        cx + Math.cos(a + 0.8) * r2 * 0.7,
+        cy + Math.sin(a - 0.4) * r2 * 0.75,
+        x2,
+        y2
+      );
+      ctx.stroke();
+    }
+  }
+  ctx.beginPath();
+  ctx.fillStyle = "rgba(255,255,255,0.06)";
+  ctx.arc(cx, cy, Math.min(w, h) * 0.16, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function hexA(hex, a) {
+  const n = parseInt(hex.slice(1), 16);
+  const r = (n >> 16) & 255;
+  const g = (n >> 8) & 255;
+  const b = n & 255;
+  return `rgba(${r},${g},${b},${a})`;
+}
+
+function drawSignal(cv) {
+  const { ctx, w, h } = fit(cv);
+  ctx.clearRect(0, 0, w, h);
+  const t = (performance.now() - t0) / 1000;
+  const cx = w * 0.38;
+  const cy = h * 0.42;
+  const cols = ["#2ef3d6", "#ff2d95", "#ff8a2a", "#4da3ff", "#c44dff", "#3dff8a"];
+  for (let i = 0; i < 6; i++) {
+    ctx.beginPath();
+    ctx.strokeStyle = hexA(cols[i], 0.55);
+    ctx.lineWidth = 1.2;
+    const rx = w * (0.16 + i * 0.028);
+    const ry = h * (0.22 + (i % 3) * 0.04);
+    ctx.ellipse(cx, cy, rx, ry, t * 0.15 + i * 0.4, 0, Math.PI * 2);
+    ctx.stroke();
+    const a = t * (0.7 + i * 0.11) + i;
+    ctx.beginPath();
+    ctx.fillStyle = cols[i];
+    ctx.arc(cx + Math.cos(a) * rx, cy + Math.sin(a) * ry, 2.4, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  const prof = status && status.market.profile;
+  if (prof && prof.hist) {
+    const hist = prof.hist;
+    const maxv = Math.max(...hist, 1);
+    const x0 = w * 0.72;
+    const bw = w * 0.22;
+    const bh = h * 0.72;
+    const y0 = h * 0.12;
+    hist.forEach((v, i) => {
+      const y = y0 + (1 - i / hist.length) * bh;
+      const hh = bh / hist.length;
+      ctx.fillStyle = hexA("#2ef3d6", 0.18 + (v / maxv) * 0.6);
+      ctx.fillRect(x0, y - hh, (v / maxv) * bw, Math.max(1, hh - 0.6));
+    });
+    ctx.fillStyle = "#ffcc66";
+    ctx.font = `${Math.max(9, h * 0.045)}px sans-serif`;
+    ctx.fillText("VA", x0, y0 - 2);
+  }
+}
+
+function drawPricer(cv) {
+  const { ctx, w, h } = fit(cv);
+  ctx.clearRect(0, 0, w, h);
+  if (!status) return;
+  const spot = status.market.spot;
+  const ref = status.market.window.ref || spot;
+  const left = Math.max(1, status.market.window.seconds_left || 1);
+  if (!spot) return;
+  const paths = 28;
+  const steps = 24;
+  const sigma = 0.55 * Math.sqrt(left / (365.25 * 24 * 3600));
+  const lo = Math.min(spot, ref) * 0.997;
+  const hi = Math.max(spot, ref) * 1.003;
+  const padL = 8, padR = w * 0.22, padT = 10, padB = 22;
+  const xOf = (i) => padL + (i / steps) * (w - padL - padR);
+  const yOf = (p) => padT + (1 - (p - lo) / Math.max(hi - lo, 1)) * (h - padT - padB);
+  const rng = mulberry(Math.floor(spot + ref));
+  for (let p = 0; p < paths; p++) {
+    ctx.beginPath();
+    let px = spot;
+    ctx.moveTo(xOf(0), yOf(px));
+    for (let i = 1; i <= steps; i++) {
+      px *= 1 + (rng() - 0.5) * 2 * sigma * 1.8;
+      ctx.lineTo(xOf(i), yOf(px));
+    }
+    ctx.strokeStyle = px >= ref ? hexA("#3dff8a", 0.28) : hexA("#ff4d6a", 0.28);
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+  ctx.strokeStyle = hexA("#f0c14b", 0.8);
+  ctx.setLineDash([4, 3]);
+  ctx.beginPath();
+  ctx.moveTo(padL, yOf(ref));
+  ctx.lineTo(w - padR, yOf(ref));
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = "#fff";
+  ctx.beginPath();
+  ctx.arc(xOf(0), yOf(spot), 3, 0, Math.PI * 2);
+  ctx.fill();
+  const prof = status.market.profile;
+  if (prof && prof.hist) {
+    const hist = prof.hist;
+    const maxv = Math.max(...hist, 1);
+    hist.forEach((v, i) => {
+      const price = prof.lo + ((i + 0.5) / hist.length) * (prof.hi - prof.lo);
+      const y = yOf(price);
+      ctx.fillStyle = hexA("#4da3ff", 0.35);
+      ctx.fillRect(w - padR + 4, y, (v / maxv) * (padR - 10), 2);
+    });
+  }
+}
+
+function mulberry(seed) {
+  let s = seed >>> 0;
+  return function () {
+    s = (s + 0x6d2b79f5) >>> 0;
+    let t = s;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function drawPnl(cv) {
+  const { ctx, w, h } = fit(cv);
+  ctx.clearRect(0, 0, w, h);
+  const pts = equity.length ? equity : [{ equity: 10000 }];
+  const ys = pts.map((p) => p.equity);
+  const min = Math.min(...ys);
+  const max = Math.max(...ys);
+  const span = Math.max(2, max - min);
+  ctx.beginPath();
+  pts.forEach((p, i) => {
+    const x = (i / Math.max(1, pts.length - 1)) * w;
+    const y = h - ((p.equity - min) / span) * (h - 6) - 3;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.strokeStyle = (status && status.wallet.pnl >= 0) ? "#3dff8a" : "#ff4d6a";
+  ctx.lineWidth = 1.6;
+  ctx.stroke();
+  ctx.lineTo(w, h);
+  ctx.lineTo(0, h);
+  ctx.closePath();
+  ctx.fillStyle = (status && status.wallet.pnl >= 0) ? "rgba(61,255,138,0.12)" : "rgba(255,77,106,0.12)";
+  ctx.fill();
+}
+
+function drawTape(cv) {
+  const { ctx, w, h } = fit(cv);
+  ctx.clearRect(0, 0, w, h);
+  const kl = (tape && tape.klines) || [];
+  if (kl.length < 2) return;
+  const highs = kl.map((k) => k.high);
+  const lows = kl.map((k) => k.low);
+  let lo = Math.min(...lows);
+  let hi = Math.max(...highs);
+  const prof = (tape && tape.profile) || (status && status.market.profile);
+  if (prof) {
+    lo = Math.min(lo, prof.val);
+    hi = Math.max(hi, prof.vah);
+  }
+  const pad = 8;
+  const yOf = (p) => pad + (1 - (p - lo) / Math.max(hi - lo, 1)) * (h - pad * 2);
+  if (prof) {
+    ctx.fillStyle = "rgba(46,243,214,0.08)";
+    const y1 = yOf(prof.vah);
+    const y2 = yOf(prof.val);
+    ctx.fillRect(0, y1, w, y2 - y1);
+    ctx.strokeStyle = hexA("#2ef3d6", 0.55);
+    ctx.beginPath(); ctx.moveTo(0, y1); ctx.lineTo(w, y1); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, y2); ctx.lineTo(w, y2); ctx.stroke();
+    ctx.strokeStyle = hexA("#f0c14b", 0.7);
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath(); ctx.moveTo(0, yOf(prof.poc)); ctx.lineTo(w, yOf(prof.poc)); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  if (status && status.market.window.ref) {
+    ctx.strokeStyle = hexA("#ff8a2a", 0.7);
+    ctx.beginPath();
+    ctx.moveTo(0, yOf(status.market.window.ref));
+    ctx.lineTo(w, yOf(status.market.window.ref));
+    ctx.stroke();
+  }
+  const cw = Math.max(2, (w / kl.length) * 0.7);
+  kl.forEach((k, i) => {
+    const x = ((i + 0.5) / kl.length) * w;
+    const up = k.close >= k.open;
+    ctx.strokeStyle = up ? "#3dff8a" : "#ff4d6a";
+    ctx.fillStyle = up ? "#3dff8a" : "#ff4d6a";
+    ctx.beginPath();
+    ctx.moveTo(x, yOf(k.high));
+    ctx.lineTo(x, yOf(k.low));
+    ctx.stroke();
+    const top = yOf(Math.max(k.open, k.close));
+    const bot = yOf(Math.min(k.open, k.close));
+    ctx.fillRect(x - cw / 2, top, cw, Math.max(1, bot - top));
+  });
+}
+
+function paint() {
+  drawSynapse($("#cv-synapse"));
+  drawSignal($("#cv-signal"));
+  drawPricer($("#cv-pricer"));
+  drawPnl($("#cv-pnl"));
+  drawTape($("#cv-tape"));
+}
+
+async function refreshHeavy() {
+  try {
+    const [s, tr, eq, tp, tk] = await Promise.all([
+      jget("/api/status"),
+      jget("/api/trace?limit=70"),
+      jget("/api/equity"),
+      jget("/api/tape"),
+      jget("/api/tickets?limit=8"),
+    ]);
+    status = s;
+    traces = tr.traces || [];
+    equity = eq.points || [];
+    tape = tp;
+    renderChrome(s);
+    renderTrace(traces);
+    renderTickets(
+      (s.open_tickets || []).concat((tk.tickets || []).filter((x) => x.status !== "open")).slice(0, 5)
+    );
+    renderBook(tp.depth, s.market.spot);
+  } catch (err) {
+    console.warn(err);
+  }
+}
+
+function loop() {
+  paint();
+  requestAnimationFrame(loop);
+}
+
+window.addEventListener("resize", paint);
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) refreshHeavy();
+});
+refreshHeavy();
+setInterval(refreshHeavy, 4000);
+requestAnimationFrame(loop);
+
+  </script>
+</body>
+</html>
